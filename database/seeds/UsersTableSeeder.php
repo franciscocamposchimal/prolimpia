@@ -25,7 +25,7 @@ class UsersTableSeeder extends Seeder
         $userAdmin->name ="franko";
         $userAdmin->email ="franko@gmail.com";
         $userAdmin->password = Hash::make('12345678');
-        $userAdmin->rol = 1;
+        $userAdmin->rol = 2;
         $userAdmin->created_at = date('Y-m-d H:m:s');
         $userAdmin->updated_at = date('Y-m-d H:m:s');
         $userAdmin->save();
