@@ -8,6 +8,15 @@ use App\Person;
 class PersonController extends Controller
 {
     /**
+     * Instantiate a new PersonController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //$this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons']]);
+    }
+    /**
      * Get all Persons.
      *
      * @return Response
@@ -32,5 +41,21 @@ class PersonController extends Controller
         $allUsers = $allUsers->get();
         
         return response()->json(['usuarios' =>  $allUsers], 200);
+    }
+
+    public function getCobro($id)
+    {
+        try {
+            $dateToday = date("d/m/Y");
+    
+            $user = Person::where('USR_NUMCON', $id)->first();
+    
+            return response()->json(['user' => $user], 200);
+    
+        } catch (\Exception $e) {
+    
+            return response()->json(['message' => 'user not found!'], 404);
+        }
+    
     }
 }

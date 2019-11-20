@@ -27,6 +27,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('users', 'UserController@allUsers');
     
     /*--- RECOLECTA_COBROS ---*/
-    // Matches "/api/payments
+    // Matches "/api/persons
     $router->get('persons', 'PersonController@allPersons');
+    // Matches "/api/persons
+    $router->put('persons/{id}', 'PersonController@getCobro');
 });

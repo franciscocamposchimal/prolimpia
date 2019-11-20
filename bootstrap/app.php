@@ -79,6 +79,10 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
 ]);
 
+$app->routeMiddleware([
+    'auth.role' => \App\Http\Middleware\RoleAuthorization::class,
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
