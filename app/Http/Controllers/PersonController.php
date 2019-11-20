@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Person;
+use App\Payment;
 
 class PersonController extends Controller
 {
@@ -14,7 +16,7 @@ class PersonController extends Controller
      */
     public function __construct()
     {
-        //$this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons']]);
+        $this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', 'getCobro']]);
     }
     /**
      * Get all Persons.
@@ -49,8 +51,42 @@ class PersonController extends Controller
             $dateToday = date("d/m/Y");
     
             $user = Person::where('USR_NUMCON', $id)->first();
+            $currentCollector = Auth::user();
+            $payment = new Payment();
+
+            if($user != null){
+                $user->USR_FECULTPAGO;
+                $user->USR_ADEUDO;
+                $user->USR_FACTUR;
+                $user->USR_IVA;
+                $user->USR_SUBTOTAL;
+                $user->USR_SUBSIDIO;
+                $user->USR_TOTAL;
+                
+                
+                $payment->numcon    = $user->USR_NUMCON; 
+                $payment->nombre    = $user->USR_NOMBRE; 
+                $payment->domici    = $user->USR_DOMICI; 
+                $payment->zona      = $user->USR_ZONA; 
+                $payment->ruta      = $user->USR_RUTA; 
+                $payment->progr     = $user->USR_PROGR;
+                $payment->cvetar    = $user->USR_CVETAR;
+                $payment->fpago     = '';
+                $payment->faviso    = $user->CTR_AVISO;
+                $payment->saldoant  = '';
+                $payment->saldopost = '';
+                $payment->iva       = $user->USR_IVA;
+                $payment->total     = $user->USR_TOTAL;
+                $payment->efectivo  = '';
+                $payment->cambio    = '';
+                $payment->tipopago  = '';
+                $payment->tusuario  = $currentCollector->name;
+                $payment->tpc       = '';
+                $payment->referencia= '';
+                $payment->estado    = '';
+            }
     
-            return response()->json(['user' => $user], 200);
+            return response()->json(['current_collector' => $currentCollector, 'user' => $user, 'payments' => $payment], 200);
     
         } catch (\Exception $e) {
     
