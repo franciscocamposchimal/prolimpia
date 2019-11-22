@@ -63,6 +63,12 @@ class PersonController extends Controller
             $payment = new Payment();
 
             if($user != null){
+
+                $pago = ($request->input('pago') == $user->USR_ADEUDO) 
+                        ? 0 
+                        : ($request->input('pago') > $user->USR_ADEUDO)
+                        ? - ($request->input('pago') - $user->USR_ADEUDO)
+                        : $user->USR_ADEUDO - $request->input('pago');
                 
                 $payment->numcon    = $user->USR_NUMCON; 
                 $payment->nombre    = $user->USR_NOMBRE; 
@@ -74,12 +80,7 @@ class PersonController extends Controller
                 $payment->fpago     = $dateToday;
                 $payment->faviso    = $user->CTR_AVISO;
                 $payment->saldoant  = $user->USR_ADEUDO;
-                $payment->saldopost = ($request->input('pago') == $user->USR_ADEUDO) 
-                                      ? 0 
-                                      : ($request->input('pago') > $user->USR_ADEUDO)
-                                      ? - ($request->input('pago') - $user->USR_ADEUDO)
-                                      : $user->USR_ADEUDO - $request->input('pago');
-
+                $payment->saldopost = $pago;
                 $payment->iva       = $user->USR_IVA;
                 $payment->total     = $user->USR_TOTAL;
                 $payment->efectivo  = $request->input('efectivo');
@@ -90,13 +91,13 @@ class PersonController extends Controller
                 $payment->referencia= '';
                 $payment->estado    = $request->input('tipo_pago');
 
-                /*$user->USR_FECULTPAGO= 0;
-                $user->USR_ADEUDO    = 0;
+                $user->USR_FECULTPAGO= $dateToday;
+                $user->USR_ADEUDO    = $pago;
                 $user->USR_FACTUR    = 0;
                 $user->USR_IVA       = 0;
                 $user->USR_SUBTOTAL  = 0;
                 $user->USR_SUBSIDIO  = 0;
-                $user->USR_TOTAL     = 0;*/
+                $user->USR_TOTAL     = 0;
             }
     
             return response()->json(['current_collector' => $currentCollector, 'user' => $user, 'payments' => $payment], 200);
