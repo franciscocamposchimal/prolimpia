@@ -45,8 +45,16 @@ class PersonController extends Controller
         return response()->json(['usuarios' =>  $allUsers], 200);
     }
 
-    public function getCobro($id)
+    public function getCobro(Request $request, $id)
     {
+        $this->validate($request, [
+            'pago'     => 'required|regex:/^\d+(\.\d{1,2})?$/',
+            'efectivo' => 'required|regex:/^\d+(\.\d{1,2})?$/',
+            'cambio'   => 'required|regex:/^\d+(\.\d{1,2})?$/',
+            'tipo_pago'=> 'required|string',
+            'estado'=> 'required|numeric',
+        ]);
+
         try {
             $dateToday = date("d/m/Y");
     
@@ -55,14 +63,6 @@ class PersonController extends Controller
             $payment = new Payment();
 
             if($user != null){
-                $user->USR_FECULTPAGO;
-                $user->USR_ADEUDO;
-                $user->USR_FACTUR;
-                $user->USR_IVA;
-                $user->USR_SUBTOTAL;
-                $user->USR_SUBSIDIO;
-                $user->USR_TOTAL;
-                
                 
                 $payment->numcon    = $user->USR_NUMCON; 
                 $payment->nombre    = $user->USR_NOMBRE; 
@@ -71,19 +71,32 @@ class PersonController extends Controller
                 $payment->ruta      = $user->USR_RUTA; 
                 $payment->progr     = $user->USR_PROGR;
                 $payment->cvetar    = $user->USR_CVETAR;
-                $payment->fpago     = '';
+                $payment->fpago     = $dateToday;
                 $payment->faviso    = $user->CTR_AVISO;
-                $payment->saldoant  = '';
-                $payment->saldopost = '';
+                $payment->saldoant  = $user->USR_ADEUDO;
+                $payment->saldopost = ($request->input('pago') == $user->USR_ADEUDO) 
+                                      ? 0 
+                                      : ($request->input('pago') > $user->USR_ADEUDO)
+                                      ? - ($request->input('pago') - $user->USR_ADEUDO)
+                                      : $user->USR_ADEUDO - $request->input('pago');
+
                 $payment->iva       = $user->USR_IVA;
                 $payment->total     = $user->USR_TOTAL;
-                $payment->efectivo  = '';
-                $payment->cambio    = '';
-                $payment->tipopago  = '';
+                $payment->efectivo  = $request->input('efectivo');
+                $payment->cambio    = $request->input('cambio');
+                $payment->tipopago  = $request->input('tipo_pago');
                 $payment->tusuario  = $currentCollector->name;
                 $payment->tpc       = '';
                 $payment->referencia= '';
-                $payment->estado    = '';
+                $payment->estado    = $request->input('tipo_pago');
+
+                /*$user->USR_FECULTPAGO= 0;
+                $user->USR_ADEUDO    = 0;
+                $user->USR_FACTUR    = 0;
+                $user->USR_IVA       = 0;
+                $user->USR_SUBTOTAL  = 0;
+                $user->USR_SUBSIDIO  = 0;
+                $user->USR_TOTAL     = 0;*/
             }
     
             return response()->json(['current_collector' => $currentCollector, 'user' => $user, 'payments' => $payment], 200);
