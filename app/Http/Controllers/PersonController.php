@@ -16,7 +16,7 @@ class PersonController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', 'getCobro']]);
+        //$this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', /*'getCobro'*/]]);
     }
     /**
      * Get all Persons.
@@ -52,24 +52,23 @@ class PersonController extends Controller
             'efectivo' => 'required|regex:/^\d+(\.\d{1,2})?$/',
             'cambio'   => 'required|regex:/^\d+(\.\d{1,2})?$/',
             'tipo_pago'=> 'required|string',
-            'estado'=> 'required|numeric',
         ]);
 
         try {
             $dateToday = date("d/m/Y");
-    
+            error_log($id);
             $user = Person::where('USR_NUMCON', $id)->first();
-            $currentCollector = Auth::user();
+            //$currentCollector = Auth::user();
             $payment = new Payment();
 
             if($user != null){
 
-                $pago = ($request->input('pago') == $user->USR_ADEUDO) 
+                $pago = ($request->input('pago') == $user->USR_TOTAL) 
                         ? 0 
-                        : ($request->input('pago') > $user->USR_ADEUDO)
-                        ? - ($request->input('pago') - $user->USR_ADEUDO)
-                        : $user->USR_ADEUDO - $request->input('pago');
-                
+                        : ($request->input('pago') > $user->USR_TOTAL)
+                        ? - ($request->input('pago') - $user->USR_TOTAL)
+                        : $user->USR_TOTAL - $request->input('pago');
+                //ticket
                 $payment->numcon    = $user->USR_NUMCON; 
                 $payment->nombre    = $user->USR_NOMBRE; 
                 $payment->domici    = $user->USR_DOMICI; 
@@ -79,28 +78,27 @@ class PersonController extends Controller
                 $payment->cvetar    = $user->USR_CVETAR;
                 $payment->fpago     = $dateToday;
                 $payment->faviso    = $user->CTR_AVISO;
-                $payment->saldoant  = $user->USR_ADEUDO;
+                $payment->saldoant  = $user->USR_TOTAL;
                 $payment->saldopost = $pago;
                 $payment->iva       = $user->USR_IVA;
-                $payment->total     = $user->USR_TOTAL;
+                $payment->total     = $request->input('pago');
                 $payment->efectivo  = $request->input('efectivo');
                 $payment->cambio    = $request->input('cambio');
-                $payment->tipopago  = $request->input('tipo_pago');
+                $payment->tipopago  = $request->input('tipo_pago');//efectivo, tarjeta, cheque
                 $payment->tusuario  = $currentCollector->name;
-                $payment->tpc       = '';
-                $payment->referencia= '';
-                $payment->estado    = $request->input('tipo_pago');
+                $payment->tpc       = '';//mac del cel
+                $payment->referencia= '';//iniciales del que cobra
+                $payment->estado    = '';
 
+                //usuarios
+                // pagos adelentados solo si esta en ceros, si es anual se regala un mes
                 $user->USR_FECULTPAGO= $dateToday;
-                $user->USR_ADEUDO    = $pago;
-                $user->USR_FACTUR    = 0;
-                $user->USR_IVA       = 0;
-                $user->USR_SUBTOTAL  = 0;
-                $user->USR_SUBSIDIO  = 0;
-                $user->USR_TOTAL     = 0;
+                $user->USR_ADEUDO    = $pago;// resto adeudo - abono , subtotal - abono y total - abono
+                $user->USR_SUBTOTAL  = 0;// resto adeudo - abono , subtotal - abono y total - abono
+                $user->USR_TOTAL     = 0;// resto adeudo - abono , subtotal - abono y total - abono
             }
     
-            return response()->json(['current_collector' => $currentCollector, 'user' => $user, 'payments' => $payment], 200);
+            return response()->json([/*'current_collector' => $currentCollector, */'user' => $user, 'payments' => $payment], 200);
     
         } catch (\Exception $e) {
     

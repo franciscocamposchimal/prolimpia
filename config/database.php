@@ -22,7 +22,7 @@ return [
           'host' => env('DB_HOST2', 'prolimpia.duckdns.org'),
           'port' => env('DB_PORT2', '3306'),
           'database' => env('DB_DATABASE2', 'prolimpia'),
-          'username' => env('DB_USERNAME2', 'root'),
+          'username' => env('DB_USERNAME2', 'smapap'),
           'password' => env('DB_PASSWORD2', ''),
           'charset' => 'utf8',
           'prefix' => '',
