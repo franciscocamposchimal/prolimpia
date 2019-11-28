@@ -9,7 +9,18 @@ use Illuminate\Auth\Authenticatable;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string $reference
+ * @property string $rol
+ * @property string $deleted_at
+ * @property string $created_at
+ * @property string $updated_at
+ * @property Collect[] $collects
+ */
 class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, Notifiable;
@@ -18,7 +29,7 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
      *
      * @var array
      */
-    protected $fillable = ['email', 'name', 'password', 'rol', 'deleted_at', 'created_at', 'updated_at'];
+    protected $fillable = ['email', 'name', 'password', 'reference', 'rol', 'deleted_at', 'created_at', 'updated_at'];
     /**
      * The attributes excluded from the model's JSON form.
      *
@@ -36,5 +47,13 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function collects()
+    {
+        return $this->hasMany('App\Collect');
     }
 }

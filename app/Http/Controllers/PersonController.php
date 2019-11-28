@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Person;
 use App\Payment;
+use App\Collect;
 
 class PersonController extends Controller
 {
@@ -16,7 +17,7 @@ class PersonController extends Controller
      */
     public function __construct()
     {
-        //$this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', /*'getCobro'*/]]);
+        $this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', 'getCobro']]);
     }
     /**
      * Get all Persons.
@@ -52,14 +53,15 @@ class PersonController extends Controller
             'efectivo' => 'required|regex:/^\d+(\.\d{1,2})?$/',
             'cambio'   => 'required|regex:/^\d+(\.\d{1,2})?$/',
             'tipo_pago'=> 'required|string',
+            'mac'=> 'required|string'
         ]);
 
         try {
             $dateToday = date("d/m/Y");
-            error_log($id);
             $user = Person::where('USR_NUMCON', $id)->first();
-            //$currentCollector = Auth::user();
+            $currentCollector = Auth::user();
             $payment = new Payment();
+            $collect = new Collect();
 
             if($user != null){
 
@@ -86,19 +88,29 @@ class PersonController extends Controller
                 $payment->cambio    = $request->input('cambio');
                 $payment->tipopago  = $request->input('tipo_pago');//efectivo, tarjeta, cheque
                 $payment->tusuario  = $currentCollector->name;
-                $payment->tpc       = '';//mac del cel
-                $payment->referencia= '';//iniciales del que cobra
-                $payment->estado    = '';
+                $payment->tpc       = $request->input('mac');//mac del cel
+                $payment->referencia= $currentCollector->reference;//iniciales del que cobra
+                $payment->estado    = 1;
 
                 //usuarios
                 // pagos adelentados solo si esta en ceros, si es anual se regala un mes
                 $user->USR_FECULTPAGO= $dateToday;
-                $user->USR_ADEUDO    = $pago;// resto adeudo - abono , subtotal - abono y total - abono
-                $user->USR_SUBTOTAL  = 0;// resto adeudo - abono , subtotal - abono y total - abono
-                $user->USR_TOTAL     = 0;// resto adeudo - abono , subtotal - abono y total - abono
+                $user->USR_ADEUDO    = $request->input('pago') - $user->USR_ADEUDO;// resto adeudo - abono , subtotal - abono y total - abono
+                $user->USR_SUBTOTAL  = $request->input('pago') - $user->USR_SUBTOTAL;// resto adeudo - abono , subtotal - abono y total - abono
+                $user->USR_TOTAL     = $request->input('pago') - $user->USR_TOTAL;// resto adeudo - abono , subtotal - abono y total - abono
+            
+                $collect->user_id = $currentCollector->id;
+                $collect->contract = $user->USR_NUMCON;
+                $collect->location = json_encode($request->input('location'));
+                $collect->data = json_encode([
+                    'pago'=>$request->input('pago'),
+                    'efectivo'=>$request->input('efectivo'),
+                    'tipo_pago'=>$request->input('tipo_pago'),
+                    'mac'=>$request->input('mac')
+                ]);
             }
     
-            return response()->json([/*'current_collector' => $currentCollector, */'user' => $user, 'payments' => $payment], 200);
+            return response()->json(['current_collector' => $currentCollector, 'user' => $user, 'collect' => $collect], 200);
     
         } catch (\Exception $e) {
     
