@@ -17,6 +17,7 @@ class Payment extends Model
      * @var array
      */
     protected $fillable = [
+        'id_cb',
         'numcon', 
         'nombre', 
         'domici', 
