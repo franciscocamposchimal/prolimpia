@@ -79,7 +79,7 @@ class PersonController extends Controller
                 $payment->progr     = $user->USR_PROGR;
                 $payment->cvetar    = $user->USR_CVETAR;
                 $payment->fpago     = $dateToday;
-                $payment->faviso    = $user->CTR_AVISO;
+                $payment->faviso    = $user->CTR_AVISO?? "";
                 $payment->saldoant  = $user->USR_TOTAL;
                 $payment->saldopost = $pago;
                 $payment->iva       = $user->USR_IVA;
@@ -95,9 +95,9 @@ class PersonController extends Controller
                 //usuarios
                 // pagos adelentados solo si esta en ceros, si es anual se regala un mes
                 $user->USR_FECULTPAGO= $dateToday;
-                $user->USR_ADEUDO    = $request->input('pago') - $user->USR_ADEUDO;// resto adeudo - abono , subtotal - abono y total - abono
-                $user->USR_SUBTOTAL  = $request->input('pago') - $user->USR_SUBTOTAL;// resto adeudo - abono , subtotal - abono y total - abono
-                $user->USR_TOTAL     = $request->input('pago') - $user->USR_TOTAL;// resto adeudo - abono , subtotal - abono y total - abono
+                $user->USR_ADEUDO    = $user->USR_ADEUDO - $request->input('pago');// resto adeudo - abono , subtotal - abono y total - abono
+                $user->USR_SUBTOTAL  = $user->USR_SUBTOTAL - $request->input('pago');// resto adeudo - abono , subtotal - abono y total - abono
+                $user->USR_TOTAL     = $user->USR_TOTAL - $request->input('pago');// resto adeudo - abono , subtotal - abono y total - abono
             
                 $collect->user_id = $currentCollector->id;
                 $collect->contract = $user->USR_NUMCON;
@@ -105,15 +105,20 @@ class PersonController extends Controller
                 $collect->data = json_encode([
                     'pago'=>$request->input('pago'),
                     'efectivo'=>$request->input('efectivo'),
+                    'cambio' =>$request->input('cambio'),
                     'tipo_pago'=>$request->input('tipo_pago'),
                     'mac'=>$request->input('mac')
                 ]);
+
+                $payment->save();
+                $user->save();
+                $collect->save();
             }
     
             return response()->json(['current_collector' => $currentCollector, 'user' => $user, 'collect' => $collect], 200);
     
         } catch (\Exception $e) {
-    
+            error_log($e);
             return response()->json(['message' => 'user not found!'], 404);
         }
     
