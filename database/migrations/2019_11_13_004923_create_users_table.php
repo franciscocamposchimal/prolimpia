@@ -13,7 +13,7 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::connection('pgsql')->create('users', function (Blueprint $table) {
+        Schema::connection('mysql')->create('users', function (Blueprint $table) {
 
             $table->engine = 'InnoDB';
             $table->charset = 'utf8';
