@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Auth;
 
 class Controller extends BaseController
 {
-    protected function respondWithToken($token)
+    protected function respondWithToken($token, $user)
     {
         return response()->json([
+            'user' => $user,
             'token' => $token,
             'token_type' => 'bearer',
             'token_created_at' => date("d/m/Y h:i:s"),

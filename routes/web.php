@@ -13,10 +13,14 @@
 
 // API route group
 $router->group(['prefix' => 'api'], function () use ($router) {
-    // Matches "/api/register
-    $router->post('register', 'AuthController@register');
-    // Matches "/api/login
-    $router->post('login', 'AuthController@login');
+    // Matches "/api/users/register
+    $router->post('users/register', 'AuthController@register');
+    // Matches "/api/users/login
+    $router->post('users/login', 'AuthController@login');
+    // Matches "/api/users/check
+    $router->get('users/check', 'AuthController@check');
+    // Matches "/api/users/check
+    $router->get('users/logout', 'AuthController@logout');
     
     // Matches "/api/profile
     $router->get('profile', 'UserController@profile');

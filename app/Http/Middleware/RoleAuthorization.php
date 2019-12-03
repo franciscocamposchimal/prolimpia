@@ -25,6 +25,7 @@ class RoleAuthorization
             $token = JWTAuth::parseToken();
             //Try authenticating user       
             $user = $token->authenticate();
+            error_log($user);
         } catch (TokenExpiredException $e) {
             //Thrown if token has expired        
             return $this->unauthorized('Your token has expired. Please, login again.');
