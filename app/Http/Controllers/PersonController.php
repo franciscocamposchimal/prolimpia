@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Person;
 use App\Payment;
 use App\Collect;
+use App\User;
 
 class PersonController extends Controller
 {
@@ -17,7 +18,7 @@ class PersonController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', 'getCobro']]);
+        $this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', 'getCobro', 'getCollects']]);
     }
     /**
      * Get all Persons.
