@@ -104,15 +104,19 @@ class PersonController extends Controller
                 $collect->contract = $user->USR_NUMCON;
                 $collect->location = json_encode($request->input('location'));
                 $collect->data = json_encode([
-                    'pago'=>$request->input('pago'),
-                    'efectivo'=>$request->input('efectivo'),
-                    'cambio' =>$request->input('cambio'),
-                    'tipo_pago'=>$request->input('tipo_pago'),
-                    'mac'=>$request->input('mac')
+                    'nombre'        =>$user->USR_NOMBRE,
+                    'zona'          =>$user->USR_ZONA,
+                    'ruta'          =>$user->USR_RUTA,
+                    'saldo_anterior'=> $user->USR_TOTAL,
+                    'pago'          =>$request->input('pago'),
+                    'efectivo'      =>$request->input('efectivo'),
+                    'cambio'        =>$request->input('cambio'),
+                    'tipo_pago'     =>$request->input('tipo_pago'),
+                    'mac'           =>$request->input('mac')
                 ]);
 
-                $payment->save();
-                $user->save();
+                //$payment->save();
+                //$user->save();
                 $collect->save();
             }
     

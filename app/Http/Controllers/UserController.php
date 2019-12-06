@@ -66,11 +66,11 @@ class UserController extends Controller
         $dateToday = date("Y-m-d");
         $total = 0;
         //error_log($dateToday);
-        //$from = date('2019-11-30');
+        $from = date('2019-11-30');
         //$collects = User::find($currentCollector->id)->collects()->get();
         $collects = User::find($currentCollector->id)
         ->collects()
-        ->whereBetween('created_at', [$dateToday." 00:00:00", $dateToday." 23:59:59"])
+        ->whereBetween('created_at', [$from." 00:00:00", $dateToday." 23:59:59"])
         ->get();
 
         foreach ($collects as $collect) {
