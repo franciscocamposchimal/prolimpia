@@ -6,9 +6,20 @@ use Illuminate\Http\Request;
 use  App\User;
 
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+
+    /**
+     * Instantiate a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['check']]);
+    }
     /**
      * Store a new user.
      *
@@ -66,7 +77,17 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondWithToken($token);
+        return $this->respondWithToken($token, Auth::user());
+    }
+
+    /**
+     * Get the authenticated User
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function check()
+    {
+        return response()->json(Auth::user(),200);
     }
 
     /**
@@ -76,9 +97,34 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth()->logout();
+        //Auth::logout();
+        try 
+        {
+            config([
+            'jwt.blacklist_enabled' => true
+            ]);
+            //\Cookie::forget(JWTAuth::parseToken());
+            //Auth::guard()->logout();
+            Auth::logout();
+            \Auth::logout(true);
+            \Auth::invalidate();
+            Auth::invalidate();
 
-        return response()->json(['message' => 'Successfully logged out']);
+            $token = JWTAuth::getToken();
+            JWTAuth::setToken($token)->invalidate(true);
+            JWTAuth::invalidate();
+            JWTAuth::invalidate(true);
+            JWTAuth::invalidate(JWTAuth::getToken());
+            JWTAuth::invalidate(JWTAuth::parseToken());
+            JWTAuth::parseToken()->invalidate();
+
+            return response()->json(['message' => 'Successfully logged out']);
+            
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json(['message' => 'There is something wrong try again']);
+        }
     }
 
     /**
@@ -88,7 +134,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        return $this->respondWithToken(Auth::refresh());
     }
 
 }

@@ -13,22 +13,28 @@
 
 // API route group
 $router->group(['prefix' => 'api'], function () use ($router) {
-    // Matches "/api/register
-    $router->post('register', 'AuthController@register');
-    // Matches "/api/login
-    $router->post('login', 'AuthController@login');
     
-    // Matches "/api/profile
-    $router->get('profile', 'UserController@profile');
-    // Matches "/api/user 
+    /*--- RECOLECTA_COBROS ---*/
+    // Matches "/api/persons
+    $router->put('persons/{id}', 'PersonController@getCobro');
+    // Matches "/api/persons
+    $router->get('persons', 'PersonController@allPersons');
+
+    // Matches "/api/users/login
+    $router->post('users/login', 'AuthController@login');
+    // Matches "/api/users/register
+    $router->post('users/register', 'AuthController@register');
+    // Matches "/api/users/check
+    $router->get('users/check', 'AuthController@check');
+    // Matches "/api/users/check
+    $router->get('users/logout', 'AuthController@logout');
+    
+    // Matches "/api/users/collects
+    $router->get('users/collects', 'UserController@getCollects');
     //get one user by id
     $router->get('users/{id}', 'UserController@getUser');
     // Matches "/api/users
     $router->get('users', 'UserController@allUsers');
-    
-    /*--- RECOLECTA_COBROS ---*/
-    // Matches "/api/persons
-    $router->get('persons', 'PersonController@allPersons');
-    // Matches "/api/persons
-    $router->put('persons/{id}', 'PersonController@getCobro');
+    // Matches "/api/profile
+    $router->get('profile', 'UserController@profile');
 });

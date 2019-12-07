@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Person;
 use App\Payment;
 use App\Collect;
+use App\User;
 
 class PersonController extends Controller
 {
@@ -17,7 +18,7 @@ class PersonController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', 'getCobro']]);
+        $this->middleware('auth.role:ADMIN,COLLECTOR', ['only' => ['allPersons', 'getCobro', 'getCollects']]);
     }
     /**
      * Get all Persons.
@@ -29,21 +30,17 @@ class PersonController extends Controller
 
         $allUsers = Person::query();
 
-        if($request->has('contract')){
-            $allUsers = $allUsers->where('USR_NUMCON', 'LIKE', '%' . trim($request->input('contract')) . '%');
+        if($request->has('q')){
+        $allUsers = $allUsers->where('USR_NUMCON', 'LIKE', '%' . trim($request->input('q')) . '%')
+        ->orWhere('USR_NOMBRE', 'LIKE', '%' . trim($request->input('q')) . '%');
         }
 
-        if($request->has('name')){
-            $allUsers = $allUsers->where('USR_NOMBRE', 'LIKE', '%' . trim($request->input('name')) . '%');
+        if(!$request->has('q')){
+            return response()->json(Person::all()->take(15), 200);
         }
 
-        if(!$request->has('contract') && !$request->has('name')){
-            return response()->json(['usuarios' =>  Person::all()->take(15)], 200);
-        }
-
-        $allUsers = $allUsers->get();
         
-        return response()->json(['usuarios' =>  $allUsers], 200);
+        return response()->json($allUsers->take(15)->get(), 200);
     }
 
     public function getCobro(Request $request, $id)
@@ -103,15 +100,19 @@ class PersonController extends Controller
                 $collect->contract = $user->USR_NUMCON;
                 $collect->location = json_encode($request->input('location'));
                 $collect->data = json_encode([
-                    'pago'=>$request->input('pago'),
-                    'efectivo'=>$request->input('efectivo'),
-                    'cambio' =>$request->input('cambio'),
-                    'tipo_pago'=>$request->input('tipo_pago'),
-                    'mac'=>$request->input('mac')
+                    'nombre'        =>$user->USR_NOMBRE,
+                    'zona'          =>$user->USR_ZONA,
+                    'ruta'          =>$user->USR_RUTA,
+                    'saldo_anterior'=> $user->USR_TOTAL,
+                    'pago'          =>$request->input('pago'),
+                    'efectivo'      =>$request->input('efectivo'),
+                    'cambio'        =>$request->input('cambio'),
+                    'tipo_pago'     =>$request->input('tipo_pago'),
+                    'mac'           =>$request->input('mac')
                 ]);
 
-                $payment->save();
-                $user->save();
+                //$payment->save();
+                //$user->save();
                 $collect->save();
             }
     
