@@ -30,21 +30,17 @@ class PersonController extends Controller
 
         $allUsers = Person::query();
 
-        if($request->has('contract')){
-            $allUsers = $allUsers->where('USR_NUMCON', 'LIKE', '%' . trim($request->input('contract')) . '%');
+        if($request->has('q')){
+        $allUsers = $allUsers->where('USR_NUMCON', 'LIKE', '%' . trim($request->input('q')) . '%')
+        ->orWhere('USR_NOMBRE', 'LIKE', '%' . trim($request->input('q')) . '%');
         }
 
-        if($request->has('name')){
-            $allUsers = $allUsers->where('USR_NOMBRE', 'LIKE', '%' . trim($request->input('name')) . '%');
+        if(!$request->has('q')){
+            return response()->json(Person::all()->take(15), 200);
         }
 
-        if(!$request->has('contract') && !$request->has('name')){
-            return response()->json(['usuarios' =>  Person::all()->take(15)], 200);
-        }
-
-        $allUsers = $allUsers->get();
         
-        return response()->json(['usuarios' =>  $allUsers], 200);
+        return response()->json($allUsers->take(15)->get(), 200);
     }
 
     public function getCobro(Request $request, $id)
