@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    protected $connection = 'mysql';
+    protected $connection = 'mysql2';
     protected $table = 'recolecta_cobros';
     protected $primaryKey = 'id_cb';
     public $timestamps = false;
