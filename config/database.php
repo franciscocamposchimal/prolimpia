@@ -2,22 +2,22 @@
 
 return [
 
-  'default' => env('DB_CONNECTION', 'pgsql'),
+  'default' => env('DB_CONNECTION', 'mysql'),
   'migrations' => 'migrations',
   'connections' => [
-      'pgsql' => [
-          'driver' => 'pgsql',
-          'host' => env('DB_HOST', '127.0.0.1'),
-          'port' => env('DB_PORT', '5400'),
-          'database' => env('DB_DATABASE', 'test'),
-          'username' => env('DB_USERNAME', 'postgres'),
-          'password' => env('DB_PASSWORD', 'pass'),
+      'mysql' => [
+          'driver' => 'mysql',
+          'host' => env('DB_HOST', 'prolimpia.duckdns.org'),
+          'port' => env('DB_PORT', '3306'),
+          'database' => env('DB_DATABASE', 'prolimpiaapirest'),
+          'username' => env('DB_USERNAME', 'smapap'),
+          'password' => env('DB_PASSWORD', ''),
           'charset' => 'utf8',
           'prefix' => '',
           'prefix_indexes' => true,
       ],
 
-      'mysql' => [
+      'mysql2' => [
           'driver' => 'mysql',
           'host' => env('DB_HOST2', 'prolimpia.duckdns.org'),
           'port' => env('DB_PORT2', '3306'),

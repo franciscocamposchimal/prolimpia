@@ -13,7 +13,7 @@ class CreateCollectsTable extends Migration
      */
     public function up()
     {
-        Schema::connection('pgsql')->create('collects', function (Blueprint $table) {
+        Schema::connection('mysql')->create('collects', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->charset = 'utf8';
             $table->collation = 'utf8_spanish_ci';
