@@ -32,15 +32,32 @@ class PersonController extends Controller
 
         if($request->has('q')){
         $allUsers = $allUsers->where('USR_NUMCON', 'LIKE', '%' . trim($request->input('q')) . '%')
-        ->orWhere('USR_NOMBRE', 'LIKE', '%' . trim($request->input('q')) . '%');
+        ->orWhere('USR_NOMBRE', 'LIKE', '%' . trim($request->input('q')) . '%')->take(15)->get();
         }
 
         if(!$request->has('q')){
             return response()->json(Person::all()->take(15), 200);
         }
 
+        foreach ($allUsers as $user) {
+            $num_length = strlen((string)$user->USR_NUMCON);
+            if($num_length <= 5){
+                $user->USR_NUMCON = str_pad($user->USR_NUMCON, 6, '0', STR_PAD_LEFT);
+            };
+        }
         
-        return response()->json($allUsers->take(15)->get(), 200);
+        return response()->json($allUsers, 200);
+    }
+
+    public function getOnePerson($id){
+        $historialCobros = Payment::where('numcon', $id)->get();
+        foreach ($historialCobros as $cobro) {
+            $num_length = strlen((string)$cobro->numcon);
+            if($num_length <= 5){
+                $cobro->numcon = str_pad($cobro->numcon, 6, '0', STR_PAD_LEFT);
+            };
+        }
+        return response()->json($historialCobros, 200);
     }
 
     public function getCobro(Request $request, $id)

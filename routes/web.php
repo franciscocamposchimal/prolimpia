@@ -18,6 +18,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // Matches "/api/persons
     $router->put('persons/{id}', 'PersonController@getCobro');
     // Matches "/api/persons
+    $router->get('persons/{id}', 'PersonController@getOnePerson');
+    // Matches "/api/persons
     $router->get('persons', 'PersonController@allPersons');
 
     // Matches "/api/users/login
