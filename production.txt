@@ -2,3 +2,5 @@ Nota * (genera nueva branch y switchea) git checkout -b <branch_name>
 1.-Borrar carpeta "vendor"
 2.-Borrar archivo "composer.lock"
 composer install --optimize-autoloader --no-dev
+test local 
+    php -S localhost:8000 -t public
